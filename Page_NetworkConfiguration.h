@@ -15,14 +15,14 @@ const char PAGE_NetworkConfiguration[] PROGMEM = R"=====(
 <strong>Сети:</strong><br>
 <table border="0"  cellspacing="3" style="width:310px" >
 <tr><td><div id="networks">Сканирование...</div></td></tr>
-<tr><td align="center"><a href="javascript:GetState()" style="width:150px" class="btn btn--m btn--green">Обновить</a></td></tr>
+<tr><td align="center"><a href="javascript:GetState()" style="width:250px" class="btn btn--m btn--green">Обновить</a></td></tr>
 </table>
 
 <form action="" method="get">
 <table border="0"  cellspacing="0" cellpadding="3" style="width:310px" >
 <tr><td align="right">SSID:</td><td><input type="text" id="ssid" name="ssid" value=""></td></tr>
 <tr><td align="right">Пароль:</td><td><input type="password" id="password" name="password" value=""></td></tr>
-<tr><td colspan="2" align="center"><input type="submit" style="width:150px" class="btn btn--m btn--green" value="Сохранить"></td></tr>
+<tr><td colspan="2" align="center"><input type="submit" style="width:250px" class="btn btn--m btn--green" value="Сохранить"></td></tr>
 </table>
 </form>
 <hr>

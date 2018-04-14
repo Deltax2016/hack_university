@@ -3,13 +3,12 @@ const char PAGE_Market[] PROGMEM = R"=====(
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <div class="container">
 <div class="row">
-<div class="col-md-12 col-sm-12 col-lg-12 col-lg-offset-3"><h1>Управление устройством.</h1></div>
+<a href="/"  class="btn btn--s"><</a>&nbsp;&nbsp;<div class="col-md-12 col-sm-offset-1 col-sm-12 col-lg-12 col-lg-offset-3"><h1 style="text-align: center;">Управление устройством.</h1></div>
 <div class="col-md-12 col-sm-12 col-lg-12 "><hr></div>
-<div class="col-md-12 col-sm-12 col-lg-12 col-lg-offset-4"><a href="/update?q=text" style="width:250px" class="btn btn--m btn--green" >Текстовый стикер</a><br></div>
-<div class="col-md-12 col-sm-12 col-lg-12 col-lg-offset-4"><a href="/update?q=weather" style="width:250px" class="btn btn--m btn--green" >Погода</a><br></div>
-<div class="col-md-12 col-sm-12 col-lg-12 col-lg-offset-4"><a href="/update?q=values"   style="width:250px"  class="btn btn--m btn--green" >Курс валют</a><br></div>
-<div class="col-md-12 col-sm-12 col-lg-12 col-lg-offset-4"><a href="/update?q=vk"   style="width:250px"  class="btn btn--m btn--green" >Трекер ВК</a><br></div>
-<div class="col-md-12 col-sm-12 col-lg-12 col-lg-offset-4"><a href="general.html"   style="width:250px"  class="btn btn--m btn--blue" >Назад</a><br></div>
+<div class="col-md-12 col-sm-12 col-sm-offset-2 col-lg-12 col-lg-offset-4"><a href="update?q=text" style="width:250px" class="btn btn--m btn--green" >Текстовый стикер</a><br></div>
+<div class="col-md-12 col-sm-12 col-lg-12 col-sm-offset-2 col-lg-offset-4"><a href="update?q=weather" style="width:250px" class="btn btn--m btn--green" >Погода</a><br></div>
+<div class="col-md-12 col-sm-12 col-lg-12 col-sm-offset-2 col-lg-offset-4"><a href="update?q=values"   style="width:250px"  class="btn btn--m btn--green" >Курс валют</a><br></div>
+<div class="col-md-12 col-sm-12 col-lg-12 col-sm-offset-2 col-lg-offset-4"><a href="update?q=vk"   style="width:250px"  class="btn btn--m btn--green" >Трекер ВК</a><br></div>
 </div>
 </div>
 <script>

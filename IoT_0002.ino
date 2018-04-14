@@ -5,6 +5,9 @@
 #include <ArduinoOTA.h>
 #include <Ticker.h>
 #include <EEPROM.h>
+#include <Wire.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
 #include <ESP8266HTTPClient.h>
 #include <ESP8266httpUpdate.h>
 //#include "Timer.h"
@@ -19,11 +22,13 @@ int num = 0;
 
 #include "Page_Admin.h"
 #include "Page_Market.h"
+#include "Page_Action.h"
 #include "Page_Script.js.h"
 #include "Page_Style.css.h"
 #include "Page_Information.h"
 #include "Page_General.h"
 #include "Page_NetworkConfiguration.h"
+
 
 bool connectOk = 0;
 
@@ -75,7 +80,6 @@ String SendHttp(String y) //функция отправки http get запро�
   http.end();
 }
 
-
 void ResetAll(){ //чистка eeprom
   EEPROM.begin(512);
   // write a 0 to all 512 bytes of the EEPROM
@@ -96,7 +100,7 @@ void deepSleep(){ //режим глубокого сна(пока не испо�
 void update(){ //http прошивка микроконтроллера
   
   server.send ( 200, "text/plain", "Ok" );
-/*t_httpUpdate_return ret = ESPhttpUpdate.update("http://neuroband.ru/file.bin");
+  t_httpUpdate_return ret = ESPhttpUpdate.update("https://github.com/hackuniversity/" + server.arg(0) + ".bin");
 
         switch(ret) {
             case HTTP_UPDATE_FAILED:
@@ -110,7 +114,7 @@ void update(){ //http прошивка микроконтроллера
             case HTTP_UPDATE_OK:
                 Serial.println("HTTP_UPDATE_OK");
                 break;
-        }*/
+        }
 }
 
 String ipToString(IPAddress ip) { //преобразует ip в строку
@@ -128,6 +132,14 @@ void setup() {
   //timer = micros();
   int WIFI_connected = false;
   Serial.begin(9600);
+  display.begin(SSD1306_SWITCHCAPVCC, 0x3c);
+  display.clearDisplay();
+  display.setTextSize(1);
+  display.setTextColor(WHITE);
+  display.setCursor(0,0);
+  display.print("Hello");
+  display.display();
+  delay(500);
   pinMode(12,INPUT);
   //**** Загрузка конфигурации сети 
   EEPROM.begin(512);
@@ -140,10 +152,6 @@ void setup() {
       
       WiFi.mode(WIFI_STA);
         flag1=1;
-  if (!config.dhcp)
-  {
-    WiFi.config(IPAddress(config.IP[0], config.IP[1], config.IP[2], config.IP[3] ),  IPAddress(config.Gateway[0], config.Gateway[1], config.Gateway[2], config.Gateway[3] ) , IPAddress(config.Netmask[0], config.Netmask[1], config.Netmask[2], config.Netmask[3] ) , IPAddress(config.DNS[0], config.DNS[1], config.DNS[2], config.DNS[3] ));
-  }
       //WiFi.begin(config.ssid.c_str(), config.password.c_str());
       WiFi.begin(config.ssid.c_str(), config.password.c_str());
       printConfig();
@@ -162,18 +170,7 @@ void setup() {
     // Конфигурации по умолчанию
     Serial.println("Setting AP mode default parameters");
     config.ssid = "IoT2";       
-    config.password = "Gigabyte2014" ; 
-    config.dhcp = true;
-    config.IP[0] = 192; config.IP[1] = 168; config.IP[2] = 1; config.IP[3] = 110;
-    config.Netmask[0] = 255; config.Netmask[1] = 255; config.Netmask[2] = 255; config.Netmask[3] = 0;
-    config.Gateway[0] = 192; config.Gateway[1] = 168; config.Gateway[2] = 1; config.Gateway[3] = 1;
-    config.DNS[0] = 192; config.DNS[1] = 168; config.DNS[2] = 1; config.DNS[3] = 1;
-    config.ntpServerName = "81.30.55.94"; 
-    config.Update_Time_Via_NTP_Every =  0;
-    config.timeZone = 3;
-    config.isDayLightSaving = true;
-    config.DeviceName = "Esp1";
-    config.email = "yourmail@site.ru";
+    config.password = "" ; 
     WiFi.mode(WIFI_AP);  
     WiFi.softAP(config.ssid.c_str());
     Serial.print("Wifi ip:");Serial.println(WiFi.softAPIP());
@@ -206,13 +203,17 @@ void setup() {
       Serial.println("style.css");
       server.send_P ( 200, "text/plain", PAGE_Style_css );
     } );
+    server.on ( "/action.html", []() {
+      Serial.println("action");
+      server.send_P ( 200, "text/html", PAGE_Action );
+    } );
     server.on ( "/microajax.js", []() {
       Serial.println("microajax.js");
       server.send_P ( 200, "text/plain", PAGE_microajax_js );
     } );
-    server.on ( "update", []() {
+    server.on ( "/market", []() {
       Serial.println("market");
-      server.send_P ( 200, "text/plain", PAGE_Market );
+      server.send_P ( 200, "text/html", PAGE_Market );
     } );
     server.on ( "/admin/values", send_network_configuration_values_html );
     server.on ( "/check", sendText );
@@ -229,31 +230,6 @@ void setup() {
     server.begin();
     Serial.println( "HTTP server started" );
 
-    // ***********  Настройки ОТА
-  
-    ArduinoOTA.setHostname(config.DeviceName.c_str());
-    ArduinoOTA.onEnd([]() {
-        ESP.restart();
-      });
-  
-    ArduinoOTA.onError([](ota_error_t error) { 
-        Serial.printf("Error[%u]: ", error);
-        if (error == OTA_AUTH_ERROR) Serial.println("Auth Failed");
-        else if (error == OTA_BEGIN_ERROR) Serial.println("Begin Failed");
-        else if (error == OTA_CONNECT_ERROR) Serial.println("Connect Failed");
-        else if (error == OTA_RECEIVE_ERROR) Serial.println("Receive Failed");
-        else if (error == OTA_END_ERROR) Serial.println("End Failed");
-        ESP.restart(); 
-      });
-  
-    ArduinoOTA.begin();
-    Serial.println("Ready");
-          for(int i=0; i<3; i++){ //мигнуть светодиодом при запуске
-           digitalWrite(LED_PIN, LOW);
-           delay(200);
-           digitalWrite(LED_PIN, HIGH);
-           delay(200);
-          }
     
 timez = millis();
 
@@ -263,20 +239,10 @@ timez = millis();
 void loop() {
   
   // всегда готовы к прошивке
-  ArduinoOTA.handle();
   server.handleClient();
 
    // обновление watchdog таймера
    customWatchdog = millis();
-
-  //============длительное нажатие кнопки
-/*int buttonstate=digitalRead(buttonPin);
-if(buttonstate==0) eventTime=millis();
-if(millis()-eventTime>5000){    // нажатие в течении 5 секунд  
-Serial.println("Spiffs formatted");
-//SPIFFS.format();
-ResetAll();
-}*/
 
 }
 

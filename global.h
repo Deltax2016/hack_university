@@ -9,11 +9,44 @@ WiFiUDP UDPNTPClient;											// NTP Client
 volatile unsigned long UnixTimestamp = 0;	// GLOBALTIME  ( Will be set by NTP)
 int cNTP_Update = 0;											// Counter for Updating the time via NTP
 Ticker tkSecond;												  // Second - Timer for Updating Datetime Structure
-
+#define OLED_RESET LED_BUILTIN
+Adafruit_SSD1306 display(OLED_RESET);
 //custom declarations
 long absoluteActualTime, actualTime;
 long  customWatchdog;                     // WatchDog to detect main loop blocking. There is a builtin WatchDog to the chip firmare not related to this one
 
+String utf8rus(String source)
+{
+  int i,k;
+  String target;
+  unsigned char n;
+  char m[2] = { '0', '\0' };
+
+  k = source.length(); i = 0;
+
+  while (i < k) {
+    n = source[i]; i++;
+
+    if (n >= 0xC0) {
+      switch (n) {
+        case 0xD0: {
+          n = source[i]; i++;
+          if (n == 0x81) { n = 0xA8; break; }
+          if (n >= 0x90 && n <= 0xBF) n = n + 0x30-1;
+          break;
+        }
+        case 0xD1: {
+          n = source[i]; i++;
+          if (n == 0x91) { n = 0xB8; break; }
+          if (n >= 0x80 && n <= 0x8F) n = n + 0x70-1;
+          break;
+        }
+      }
+    }
+    m[0] = n; target = target + String(m);
+  }
+return target;
+}
 
 struct strConfig {
   boolean dhcp;                         // 1 Byte - EEPROM 16 
